@@ -1,255 +1,185 @@
-/* import React, { useContext, useState } from 'react'
-import { collection, getDoc, getDocs, query, where, doc, setDoc, updateDoc, serverTimestamp, Timestamp } from "firebase/firestore";
-import {db} from "../firebase"
-import {AuthContext} from "../context/AuthContext"
-import { AiOutlineSearch } from 'react-icons/ai';
+import React, { useContext, useState, useCallback, useRef } from 'react';
+import { collection, getDoc, getDocs, query, where, doc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
+import { db } from "../firebase";
+import { AuthContext } from "../context/AuthContext";
+import { AiOutlineSearch, AiOutlineUserAdd } from 'react-icons/ai';
+import { IoMdArrowRoundBack } from 'react-icons/io';
+import debounce from 'lodash.debounce';
+import Chats from '../components/Chats';
+import { BeatLoader } from 'react-spinners';
 
 const Search = () => {
-  const [username, setUsername] = useState("")
-  const [user, setUser] = useState(null)
-  const [err, setErr] = useState(false)
+  const [username, setUsername] = useState("");
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showChats, setShowChats] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isSearchMode, setIsSearchMode] = useState(true);
 
-  const {currentUser} = useContext(AuthContext)
+  const inputRef = useRef(null); // Reference to the input field
 
-  const handleSearch = async () => {
-    const q = query(
-      collection(db, "users"),
-      where("displayName", "==", username.toLocaleLowerCase())
-    );
+  const { currentUser } = useContext(AuthContext);
+  const latestSearchText = useRef("");  // Ref to store the latest search text
+
+  const handleSearch = useCallback(debounce(async () => {
+    const searchText = latestSearchText.current.trim();
+
+    if (searchText === "") {
+      setUsers([]);
+      setLoading(false);
+      return;
+    }
+
     try {
+      const usersRef = collection(db, "users");
+      const q = query(
+        usersRef,
+        where("displayName", ">=", searchText.toLowerCase()),
+        where("displayName", "<=", searchText.toLowerCase() + '\uf8ff')
+      );
+
       const querySnapshot = await getDocs(q);
+
       if (querySnapshot.empty) {
-        // No user found
-        setErr(true);
-        setUser(null); // Clear any previously found user
-        setTimeout(() => setErr(false), 3000);
+        setUsers([]);
+        setLoading(false)
       } else {
-        // User found
+        const matchedUsers = [];
         querySnapshot.forEach((doc) => {
-          setUser(doc.data());
+          matchedUsers.push(doc.data());
         });
-        setErr(false); // Reset error state
+        setUsers(matchedUsers);
+        setLoading(false)
       }
     } catch (error) {
-      // Error occurred during query execution
-      setErr(true);
-      setUser(null); // Clear any previously found user
-      console.error("Error searching for user:", error);
+      console.error("Error searching for users:", error);
+      setLoading(false)
     }
+  }, 500), []); // Debounce with a delay of 500ms
+
+  const handleInputChange = (e) => {
+    const searchText = e.target.value;
+    setUsername(searchText);
+    setSearchTerm(searchText);
+
+    // Update the ref with the latest search text
+    latestSearchText.current = searchText;
+
+    if (searchText.trim() === "") {
+      setUsers([]);
+      return;
+    }
+
+    handleSearch();  // Trigger the debounced search function
+    setLoading(true)
   };
 
-  const handleKey = (e) => {
-    e.code === "Enter" && handleSearch();
-  }
+  const handleSearchIconClick = () => {
+    setIsSearchMode(false); // Switch to back arrow icon
+    inputRef.current.focus(); // Focus the input field
+  };
 
-  const handleSelect = async () => {
-    //check whether the group(chats in firestore) exists, if not create
+  const handleBackIconClick = () => {
+    setIsSearchMode(true); // Switch back to search icon
+    inputRef.current.blur(); // Remove focus from input field
+    setUsername(""); // Optionally clear the input when going back to search icon
+  };
+
+  const handleSelect = async (user) => {
     const combinedId =
       currentUser.uid > user.uid
         ? currentUser.uid + user.uid
         : user.uid + currentUser.uid;
 
-        try {
-          const res = await getDoc(doc(db, "chats", combinedId));
+    try {
+      const res = await getDoc(doc(db, "chats", combinedId));
 
-          if (!res.exists()) {
-            //create a chat in chats collection
-            await setDoc(doc(db, "chats", combinedId), { messages: [] }); 
+      if (!res.exists()) {
+        await setDoc(doc(db, "chats", combinedId), { messages: [] });
 
-            //create user chats
-            await updateDoc(doc(db, "userChats", currentUser.uid), {
-              [combinedId + ".userInfo"]: {
-                uid: user.uid,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                isOnline: user.isOnline,
-                email: user.email,
-              },
-              [combinedId + ".date"]: Timestamp.now(),
-            });  
-            
-            const docRef = doc(db, "users", currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            // return docSnap.data();
+        await updateDoc(doc(db, "userChats", currentUser.uid), {
+          [combinedId + ".userInfo"]: {
+            uid: user.uid,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            isOnline: user.isOnline,
+            email: user.email,
+          },
+          [combinedId + ".date"]: Timestamp.now(),
+        });
 
-            await updateDoc(doc(db, "userChats", user.uid), {
-              [combinedId + ".userInfo"]: {
-                uid: currentUser.uid,
-                displayName: currentUser.displayName,
-                photoURL: currentUser.photoURL,
-                isOnline: docSnap.data().isOnline,
-                email: currentUser.email,
-              },
-              [combinedId + ".date"]: Timestamp.now(),
-            });
-          }
-        } catch (error) {}
-        
-        setUser(null);
-        setUsername("")
-  }
+        const docRef = doc(db, "users", currentUser.uid);
+        const docSnap = await getDoc(docRef);
 
+        await updateDoc(doc(db, "userChats", user.uid), {
+          [combinedId + ".userInfo"]: {
+            uid: currentUser.uid,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL,
+            isOnline: docSnap.data().isOnline,
+            email: currentUser.email,
+          },
+          [combinedId + ".date"]: Timestamp.now(),
+        });
+      }
+    } catch (error) {
+      console.error("Error selecting user:", error);
+    }
+
+    setUsers([]);
+    setUsername("");
+    setShowChats(true);
+    setSearchTerm("");
+  };
 
   return (
     <div className='search'>
-      <div className="searchForm">
-        <AiOutlineSearch color='white'/>
-        <input 
-          type="text" 
-          placeholder='Search a username...' 
-          onKeyDown={handleKey} 
-          onChange={e=>setUsername(e.target.value)}
+      <div className='searchForm2'>
+        {isSearchMode ? (
+          <AiOutlineSearch className='button' onClick={handleSearchIconClick} />
+        ) : (
+          <IoMdArrowRoundBack className='button' onClick={handleBackIconClick} />
+        )}
+        <input
+          ref={inputRef} // Attach the ref to the input element
+          type="text"
+          placeholder='Add user...'
+          onChange={handleInputChange}
           value={username}
-          autoFocus
+          onFocus={() => setIsSearchMode(false)} // Switch to back arrow when focused
+          onBlur={() => setIsSearchMode(true)}
         />
       </div>
-      {err && <span className="error-msg">User not found!</span>}
-      {user && 
-        <div className="userChat" onClick={handleSelect}>
-          <img src={user.photoURL} alt="" />
-          <div className="userChatInfo">
-            <span>{user.displayName}</span>
-          </div>
+      <div className='chatsTitle'>CHATS</div>
+      <Chats 
+        searchTerm={searchTerm}
+        showChats={showChats}
+        setShowChats={setShowChats}
+      />
+      {searchTerm.length !== 0 && <div className='usersTitle'>USERS</div>}
+      {loading ?
+        (<div className='loader'><BeatLoader size={8} color={'white'} loading={loading} /></div>):
+        (searchTerm.length !== 0 && users.length === 0) && 
+          <div className='noUsers'>No users found</div>
+      }
+      {users.length > 0 && (
+        <div className="userList">
+          {users.map((user) => (
+            user.uid !== currentUser.uid && (
+              <div key={user.uid} className="userChat newUser">
+                <div className='userProfile'>
+                  <img src={user.photoURL} alt="" />
+                  <div className="userChatInfo">
+                    <span>{user.displayName}</span>
+                  </div>
+                </div>
+                <AiOutlineUserAdd className='button' onClick={() => handleSelect(user)} />
+              </div>
+          )))}
         </div>
-      }
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Search */
-
-import React, { useContext, useState } from 'react'
-import { collection, getDoc, getDocs, query, where, doc, setDoc, updateDoc, serverTimestamp, Timestamp } from "firebase/firestore";
-import {db} from "../firebase"
-import {AuthContext} from "../context/AuthContext"
-import { AiOutlineClose, AiOutlinePlus, AiOutlineSearch, AiOutlineUserAdd } from 'react-icons/ai';
-
-const Search = () => {
-  const [username, setUsername] = useState("")
-  const [user, setUser] = useState(null)
-  const [err, setErr] = useState(false)
-  const [addUser, setAddUser] = useState(false)
-
-  const {currentUser} = useContext(AuthContext)
-
-  const handleSearch = async () => {
-    const q = query(
-      collection(db, "users"),
-      where("displayName", "==", username.toLocaleLowerCase())
-    );
-    try {
-      const querySnapshot = await getDocs(q);
-      if (querySnapshot.empty) {
-        // No user found
-        setErr(true);
-        setUser(null); // Clear any previously found user
-        setTimeout(() => setErr(false), 3000);
-      } else {
-        // User found
-        querySnapshot.forEach((doc) => {
-          setUser(doc.data());
-        });
-        setErr(false); // Reset error state
-      }
-    } catch (error) {
-      // Error occurred during query execution
-      setErr(true);
-      setUser(null); // Clear any previously found user
-      console.error("Error searching for user:", error);
-    }
-  };
-
-  const handleKey = (e) => {
-    e.code === "Enter" && (handleSearch() && setAddUser(!addUser));
-  }
-
-  const handleSelect = async () => {
-    //check whether the group(chats in firestore) exists, if not create
-    const combinedId =
-      currentUser.uid > user.uid
-        ? currentUser.uid + user.uid
-        : user.uid + currentUser.uid;
-
-        try {
-          const res = await getDoc(doc(db, "chats", combinedId));
-
-          if (!res.exists()) {
-            //create a chat in chats collection
-            await setDoc(doc(db, "chats", combinedId), { messages: [] }); 
-
-            //create user chats
-            await updateDoc(doc(db, "userChats", currentUser.uid), {
-              [combinedId + ".userInfo"]: {
-                uid: user.uid,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                isOnline: user.isOnline,
-                email: user.email,
-              },
-              [combinedId + ".date"]: Timestamp.now(),
-            });  
-            
-            const docRef = doc(db, "users", currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            // return docSnap.data();
-
-            await updateDoc(doc(db, "userChats", user.uid), {
-              [combinedId + ".userInfo"]: {
-                uid: currentUser.uid,
-                displayName: currentUser.displayName,
-                photoURL: currentUser.photoURL,
-                isOnline: docSnap.data().isOnline,
-                email: currentUser.email,
-              },
-              [combinedId + ".date"]: Timestamp.now(),
-            });
-          }
-        } catch (error) {}
-        
-        setUser(null);
-        setUsername("")
-  }
-
-
-  return (
-    <div className='search'>
-      {addUser && <div className="searchForm">
-        {addUser ? 
-          <AiOutlineClose 
-            className='button'
-            onClick={() => {setAddUser(!addUser)}}
-          /> : 
-          <AiOutlineSearch 
-            color='white'
-          />
-        }
-        <input 
-          type="text" 
-          placeholder='Search a username...' 
-          onKeyDown={handleKey} 
-          onChange={e=>setUsername(e.target.value)}
-          value={username}
-          autoFocus
-        />
-      </div>}
-      {!addUser && 
-        <AiOutlineUserAdd 
-          className='button' 
-          onClick={() => {setAddUser(!addUser)}}
-          style={{marginTop:'21px', marginLeft:'10px', marginBottom:'7px'}}
-        />
-      }
-      {err && <span className="error-msg">User not found!</span>}
-      {user && 
-        <div className="userChat" onClick={handleSelect}>
-          <img src={user.photoURL} alt="" />
-          <div className="userChatInfo">
-            <span>{user.displayName}</span>
-          </div>
-        </div>
-      }
-    </div>
-  )
-}
-
-export default Search
+export default Search;

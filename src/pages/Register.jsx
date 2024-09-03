@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Add from "../img/addAvatar.png";
+import DefaultAvatar from "../img/default_avatar.png";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -19,21 +20,22 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const displayName = e.target[0].value;
+    const displayName = e.target[0].value.toLocaleLowerCase();
     const email = e.target[1].value;
     const password = e.target[2].value;
-    const file = e.target[3].files[0];
+    const reconfirmPassword = e.target[3].value;
+    let file = e.target[4].files[0];
 
     // Reset highlighted fields
     setHighlightedFields([]);
 
-    if (!displayName || !email || !password || !file) {
+    if (!displayName || !email || !password) {
       // Highlight the empty fields
       const fields = [];
       if (!displayName) fields.push(0);
       if (!email) fields.push(1);
       if (!password) fields.push(2);
-      if (!file) fields.push(3);
+      if (!reconfirmPassword) fields.push(3)
       setHighlightedFields(fields);
       return;
     }
@@ -44,8 +46,21 @@ export const Register = () => {
       return;
     }
 
+    if(reconfirmPassword !== password) {
+      setHighlightedFields((prevFields) => [...prevFields, 3]);
+      return;
+    }
+
+    // If no file is provided, use the default avatar
+    if (!file) {
+      const response = await fetch(DefaultAvatar);
+      const blob = await response.blob();
+      file = new File([blob], "default_avatar.png", { type: "image/png" });
+    }
+
     try {
       setIsLoading(true); // Set isLoading to true when sign-in is initiated
+
       // Create user
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -61,6 +76,7 @@ export const Register = () => {
               displayName,
               photoURL: downloadURL,
             });
+
             // Create user on Firestore
             await setDoc(doc(db, "users", res.user.uid), {
               uid: res.user.uid,
@@ -80,6 +96,7 @@ export const Register = () => {
         });
       });
     } catch (err) {
+      console.log(err);
       setErr(true);
       setTimeout(() => {
         setErr(false);
@@ -111,32 +128,49 @@ export const Register = () => {
         <span className="logo">Chat App</span>
         <span className="title">Register</span>
         <form onSubmit={handleSubmit}>
+          <div>
+            <div className="fieldName"><span>*</span> Name <span>Required</span></div>
+            <input
+              required
+              type="text"
+              placeholder="display name"
+              className={highlightedFields.includes(0) ? 'highlight' : ''}
+              autoFocus
+            />
+          </div>
+          <div>
+          <div className="fieldName"><span>*</span> Email Address <span>Required</span></div>
+            <input
+              required
+              type="email"
+              placeholder="example@gmail.com"
+              className={highlightedFields.includes(1) ? 'highlight' : ''}
+            />
+          </div>
+          <div>
+          <div className="fieldName"><span>*</span> Create password <span>Required</span></div>
+            <input
+              required
+              type="password"
+              placeholder="password length minimum 8 characters"
+              className={highlightedFields.includes(2) ? 'highlight' : ''}
+            />
+          </div>
+          <div>  
+          <div className="fieldName"><span>*</span> Confirm password <span>Required</span></div>
+            <input
+              required
+              type="password"
+              placeholder="confirm password"
+              className={highlightedFields.includes(3) ? 'highlight' : ''}
+            />
+          </div>
           <input
-            required
-            type="text"
-            placeholder="display name"
-            className={highlightedFields.includes(0) ? 'highlight' : ''}
-            autoFocus
-          />
-          <input
-            required
-            type="email"
-            placeholder="email"
-            className={highlightedFields.includes(1) ? 'highlight' : ''}
-          />
-          <input
-            required
-            type="password"
-            placeholder="password length minimum 8 characters"
-            className={highlightedFields.includes(2) ? 'highlight' : ''}
-          />
-          <input
-            required
             style={{ display: "none" }}
             type="file"
             id="file"
             onChange={handleFileChange}
-            className={highlightedFields.includes(3) ? 'highlight' : ''}
+            className={highlightedFields.includes(4) ? 'highlight' : ''}
             accept="image/*"
           />
           <label htmlFor="file">
@@ -148,7 +182,7 @@ export const Register = () => {
             ) : (
               <img src={Add} alt="" />
             )}
-            <span>{previewURL ? "Change avatar" : "Add an avatar"}</span>
+            <span>{previewURL ? "Change profile pic" : "Add a profile pic"} <span style={{color:"red", fontStyle:"italic"}}>Optional</span></span>
           </label>
           {isLoading ? (
             <button disabled>
@@ -157,7 +191,7 @@ export const Register = () => {
           ) : (
             <button>Sign up</button>
           )}
-          {err && <span>Something went wrong</span>}
+          {err && <span className="errorMessage">Invalid Email format or password!!!</span>}
         </form>
         <p>
           Already have an account? <Link to="/login">Login</Link>

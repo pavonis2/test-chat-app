@@ -1,39 +1,144 @@
-import React, { useContext, /* useEffect, */ useRef, useState } from 'react'
+import React, { useContext, useEffect, /* useEffect, */ useRef, useState } from 'react'
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
-import { convertedDateTime } from './Functions';
-import { doc, updateDoc } from "firebase/firestore";
+import { displayDateOrTime } from './Functions';
+import { arrayRemove, doc, updateDoc } from "firebase/firestore";
 import { db } from '../firebase';
-import { AiFillDelete } from 'react-icons/ai'
+import { RiArrowDropDownLine } from "react-icons/ri";
+import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 const Message = ({message, msgId, messages}) => {
   const [err, setErr] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // State to track whether the message is being edited
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // State to store the new message text during editing
+  const [newMessageText, setNewMessageText] = useState(message.text);
+
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
 
-  const ref = useRef();
+  // Reference to the dropdown
+  const dropdownRef = useRef();
 
-  /* useEffect(() => {
-    ref.current?.scrollIntoView({behavior:"smooth"})
-  }, [message]) */
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
-  const handleRemoveMessage = async (messageId) => {
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Close dropdown if "Escape" is pressed
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  // Function to switch to edit mode
+  const handleEditMessage = () => {
+    setIsEditing(true);
+    setIsDropdownOpen(false); // Close dropdown after clicking "Edit"
+  };
+
+  // Function to save the edited message
+  const handleSaveMessage = async() => {
     try {
-      await updateDoc(doc(db, "chats", data.chatId), {
-        messages: messages.filter((m) => m.id !== messageId)
-      });
-      
+      if(newMessageText) {
+        // Update the specific message's text in the messages array
+        const updatedMessages = messages.map((m) => 
+          m.id === msgId ? { ...m, text: newMessageText, edited: true } : m
+        );
+
+        // Update the messages in the Firestore document
+        await updateDoc(doc(db, "chats", data.chatId), {
+          messages: updatedMessages
+        });
+        if(messages[messages.length-1].id === msgId) {
+          await updateDoc(doc(db, "userChats", currentUser.uid), {
+            [data.chatId + ".lastMessage"]: {
+              isSeen: true,
+              senderId: currentUser.uid,
+              text: newMessageText,
+            },
+          });
+          await updateDoc(doc(db, "userChats", data.user.uid), {
+            [data.chatId + ".lastMessage"]: {
+              isSeen: false,
+              senderId: currentUser.uid,
+              text: newMessageText,
+            },
+          });
+        }
+        // Exit edit mode after saving
+        setIsEditing(false);
+      }
     } catch (error) {
       setErr(true);
       console.log(error);
     }
   };
 
+  const handleRemoveMessage = async() => {
+    console.log('Delete clicked');
+    // Handle delete action
+    try {
+      const chatRef = doc(db, "chats", data.chatId);
+      const messageToDelete = messages.find((m) => m.id === msgId);
+      console.log(messageToDelete)
+      if (messageToDelete) {
+        await updateDoc(chatRef, {
+          messages: arrayRemove(messageToDelete),
+        });
+
+        if(messages[messages.length-1].id === msgId) {
+          await updateDoc(doc(db, "userChats", currentUser.uid), {
+            [data.chatId + ".lastMessage"]: {
+              isSeen: true,
+              senderId: currentUser.uid,
+              text:"🚫This message was deleted",
+            },
+          });
+          await updateDoc(doc(db, "userChats", data.user.uid), {
+            [data.chatId + ".lastMessage"]: {
+              isSeen: false,
+              senderId: currentUser.uid,
+              text:"🚫This message was deleted",
+            },
+          });      
+        }
+      } else {
+        console.log("Message not found");
+      }
+    } catch (error) {
+      setErr(true);
+      console.log(error);
+    }
+    setIsDropdownOpen(false);
+  };
+
   return (
-    <div 
-      ref={ref}
-      className={`message ${message.senderId === currentUser.uid && "owner"}`}
-    >
+    <div className={`message ${message.senderId === currentUser.uid && "owner"}`}>
       <div className="messageInfo">
         <img 
           src={message.senderId === currentUser.uid 
@@ -41,19 +146,43 @@ const Message = ({message, msgId, messages}) => {
             : data.user.photoURL} 
           alt="" 
         />
-        <span>{convertedDateTime(message.date.seconds).time}</span>
+        <span>{displayDateOrTime(message.date.seconds)}</span>
       </div>
       <div className="messageContent">
-        {message.text && <p>{message.text}</p>}
-        {message.img && <img src={message.img} alt="" />}
-        <div className='delTime'>
-          {convertedDateTime(message.date.seconds).date}
-          <AiFillDelete 
-            style={{display : message.senderId === currentUser.uid ? "inline" : "none"}}
-            onClick={() => handleRemoveMessage(msgId)}
-            className='delChat'
-          />
-        </div>
+        {message.text && (
+          isEditing ? (
+            // If in edit mode, render an input field and save button
+            <div className='editMode'>
+              <input 
+                type="text" 
+                value={newMessageText} 
+                onChange={(e) => setNewMessageText(e.target.value)} 
+                autoFocus
+              />
+              <IoIosCheckmarkCircleOutline onClick={handleSaveMessage} size={34} className='icon'/>
+            </div>
+          ) : (
+            // If not in edit mode, render the message text
+            <div className='text'>
+              <p>{message.text}{message.edited && <span>Edited</span>}</p>
+              <RiArrowDropDownLine onClick={toggleDropdown} className='icon' size={24}/>
+            </div>
+          )
+        )}
+        {message.img && 
+          <div className='image'>
+            <img src={message.img} alt="" />
+            <RiArrowDropDownLine onClick={toggleDropdown} className='icon' size={24}/>
+          </div>
+        }
+        {isDropdownOpen && (
+          <div className="dropdownMenu" ref={dropdownRef}>
+            {message.text && (
+              <div className="dropdownItem" onClick={handleEditMessage}>Edit</div>
+            )}
+            <div className="dropdownItem" onClick={handleRemoveMessage}>Delete</div>
+          </div>
+        )}
       </div>
     </div>
   )

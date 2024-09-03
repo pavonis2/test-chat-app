@@ -24,3 +24,6 @@ yarn-error.log*
 
 #firebase credentials
 firebasecredentials.js
+
+#test user credentials
+testUserCredentials.js

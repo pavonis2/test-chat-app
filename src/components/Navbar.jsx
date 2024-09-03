@@ -4,15 +4,19 @@ import { auth, db } from '../firebase'
 import { AuthContext } from '../context/AuthContext'
 import { FiLogOut } from 'react-icons/fi';
 import { doc, updateDoc } from 'firebase/firestore';
+import { ChatContext } from '../context/ChatContext';
 
 const Navbar = () => {
   const {currentUser} = useContext(AuthContext)
   const [showModal, setShowModal] = useState(false);
+  const { dispatch } = useContext(ChatContext); // Access dispatch from ChatContext
+
   const signout = async (auth) => {
     await updateDoc(doc(db, "users", currentUser?.uid), {
       isOnline: false,
     })
-
+    // Reset the chat data
+    dispatch({ type: "RESET_CHAT" });
     signOut(auth);
   }
   
@@ -26,25 +30,17 @@ const Navbar = () => {
         <img src={currentUser.photoURL} alt="" />
         <span>{currentUser.displayName}</span>
       </div>
-        <FiLogOut 
-          onClick={() => signout(auth)}
-          className='button'
-        />
-        {showModal && (
+      <div className='logout' onClick={() => signout(auth)}>
+        <FiLogOut size={20}/>
+        <span>Logout</span>
+      </div>
+      {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <div style={{fontSize:"20px", color:"black"}}><span style={{fontWeight:"bold"}}>User:</span>  {currentUser.displayName}</div>
-            <img src={currentUser.photoURL} alt=""
-              style={{
-                height:"100px", 
-                width: "100px", 
-                borderRadius: "50%",
-                objectFit: "cover",
-                outline: "2px solid",
-              }}
-            />
-            <div style={{color:"gray"}}>Email: {currentUser.email}</div>
-            <div className="close" onClick={toggleModal}>{/* &times; */}close</div>
+            <div className='userName'><span>User:</span>  {currentUser.displayName}</div>
+            <img src={currentUser.photoURL} alt=""/>
+            <div className='email'>Email: {currentUser.email}</div>
+            <div className="close" onClick={toggleModal}>close</div>
           </div>
         </div>
       )}

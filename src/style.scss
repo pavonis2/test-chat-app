@@ -51,7 +51,14 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-
+      .fieldName{
+        font-weight: bold;
+        span{
+          color: red;
+          font-style: italic;
+          font-size: 14px;
+        }
+      }
       input{
         padding: 15px;
         border: none;
@@ -94,10 +101,11 @@
         }
 
         img {
-          width: 32px;
+          width: 38px;
+          height: 38px;
           object-fit: cover;
           border: 2px solid;
-          border-radius: 30%;
+          border-radius: 50%;
         }
       }
 
@@ -138,6 +146,9 @@
       position: relative;
       min-width: 300px;
       max-width: 300px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
 
       .navbar{
         display: flex;
@@ -148,30 +159,18 @@
         justify-content: space-between;
         color: #ddddf7;
 
-        .logo{
-          font-weight: bold;
-          @include tablet{
-            display: none;
-          }
-        }
-
         .user{
           display: flex;
           gap: 10px;
           align-items: center;
           padding: 10px;
-          &:hover{
-            background-color:  #19182b;
-            cursor: pointer;
-            border-radius: 5px;
-          }
-          &:active{
-            background-color:  #19182b;
-            cursor: pointer;
-            box-shadow: 2px 2px #19182b;
-            border-radius: 5px;
-          }
-
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          &:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255); 
+            }
           img {
             background-color: #ddddf7;
             height: 38px;
@@ -181,23 +180,26 @@
             outline: 2px solid;
           }
         }
-        .button {
+        .logout{
+          display: flex;
+          align-items: center;
           color: #ddddf7;
-          font-size: 20px;
           cursor: pointer;
           padding: 3px;
-          &:hover, 
-          &:focus {
-            outline: 1px solid;
-            padding: 3px;
-          }
-          &:active{
-            outline: 2px solid;
-            padding: 3px;
+          gap: 5px;
+          background-color: rgb(255, 255, 255); 
+          color: rgb(1, 11, 46); 
+          border: 2px solid rgb(255, 255, 255); 
+          font-weight: bold;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          &:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255); 
           }
         }
         .modal {
-          // display: block; /* Ensure the modal is displayed */
           position: fixed;
           z-index: 1;
           left: 0;
@@ -205,91 +207,117 @@
           width: 100%;
           height: 100%;
           background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-          // overflow: auto;
   
           .modal-content {
             background-color: #fefefe;
             margin: 15% auto; /* 15% from the top and centered */
             padding: 20px;
             border: 1px solid #888;
-            width: 200px;
+            width: fit-content;
+            min-width: 200px;
             border-radius: 5px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             justify-content: center;
             align-items: center;
-            .close {
+            .userName{
+              font-size: 20px;
               color: black;
-              background-color: #dddddd;
+              span{
+                font-weight: bold;
+              }
+            }
+            img{
+              height: 100px;
+              width: 100px;
+              border-radius: 50%;
+              object-fit: cover;
+              outline: 2px solid;
+            }
+            .email{
+              color: black;
+            }
+            .close {
               float: right;
               font-size: 18px;
               padding: 5px;
               border-radius: 5px;
-              &:hover, 
-              &:focus {
-                color: #ffffff;
-                background-color: rgb(110, 110, 110);
-                text-decoration: none;
-                cursor: pointer;
-                padding: 5px;
-                box-shadow: 2px 2px #000000;
+              background-color: rgb(189, 188, 188); 
+              color: rgb(1, 11, 46); 
+              border: 2px solid rgb(255, 255, 255); 
+              font-weight: bold;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: background-color 0.3s ease, color 0.3s ease;
+              &:hover {
+                background-color: rgb(0, 0, 0);
+                color: rgb(255, 255, 255); 
               }
             }
           }
         }
       }
-
-      .search{
-        position: relative;
-        gap: 10px;
-        .searchForm {
-          padding: 10px;
-          display: flex;
-          align-items: center;
-          gap: 3px;
-          background-color: rgb(1, 11, 46);
-          border-radius: 25px;
-          margin-top: 10px;
-          input {
-            padding: 6px;
-            border: none;
-            color: white;
-            outline: none;
+      .body{
+        flex: 1;
+        overflow-y: auto;
+        &::-webkit-scrollbar {
+          width: 0.5em;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: rgb(114, 114, 114);
+        }
+        .search{
+          position: relative;
+          gap: 10px;
+          margin-bottom: 10px;
+          .searchForm2 {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
             background-color: rgb(1, 11, 46);
-            &::placeholder {
-              color: lightgray;
-              font-size: 15px;
-              padding-left: 4px;
-              padding-top: 20px;
+            border-radius: 25px;
+            margin-top: 10px;
+            input {
+              padding: 6px;
+              border: none;
+              color: white;
+              outline: none;
+              background-color: rgb(1, 11, 46);
+              &::placeholder {
+                color: lightgray;
+                font-size: 15px;
+                padding-left: 4px;
+                padding-top: 20px;
+              }
             }
           }
-        }
-        .button {
-          color: #ddddf7;
-          font-size: 20px;
-          cursor: pointer;
-          padding: 3px;
-          &:hover, 
-          &:focus {
-            outline: 1px solid;
+          .button {
+            color: #ddddf7;
+            font-size: 20px;
+            cursor: pointer;
             padding: 3px;
           }
-          &:active{
-            outline: 2px solid;
-            padding: 3px;
+          .userList{
+            margin-top: 10px;
           }
-        }
-        .error-msg {
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-          color: rgb(255, 255, 255);
-          background-color: rgb(255, 0, 0);
-          padding: 5px 10px;
-          border-radius: 5px;
-          font-size: 14px;
-          animation: fadeOut 3s forwards;
+          .chatsTitle{
+            color: white;
+            padding: 20px;
+          }
+          .usersTitle{
+            color: #ffffff;
+            padding: 50px 20px 10px 20px;
+          }
+          .loader{
+            padding: 0px 20px;
+          }
+          .noUsers{
+            color: #939393;
+            padding: 20px 90px;
+          }
         }
       }
 
@@ -301,7 +329,10 @@
           opacity: 0;
         }
       }
-
+      .nochats{
+        color: #939393;
+        padding: 20px 60px;
+      }
       .userChat{
         padding: 10px;
         display: flex;
@@ -309,9 +340,42 @@
         gap: 10px;
         color: white;
         cursor: pointer;
+        &.newUser{
+          display: flex;
+          justify-content: space-between;
+          .button{
+            background-color: rgb(255, 255, 255); 
+            color: rgb(1, 11, 46); 
+            border: 2px solid rgb(255, 255, 255); 
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            &:hover {
+              background-color: rgb(0, 0, 0);
+              color: rgb(255, 255, 255); 
+            }
+          }
+          .userProfile{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+        }
+        &.unseen {
+          .userChatInfo{
+            .userChatInfo_title{
+              .time{
+                color: rgb(0, 255, 0);
+                font-size: 12px;
+              }
+            }
+          }
+          background-color: rgb(101, 101, 255);
+        }
 
         &:hover {
-          background-color: #2f2d52;
+          background-color:#737373;
         }
 
         img{
@@ -320,16 +384,23 @@
           border-radius: 50%;
           object-fit: cover;
           outline: 2px solid;
+          flex-shrink: 0;
         }
 
         .userChatInfo{
-          .name{font-size: 18px; font-weight: 500;}
-          p{font-size: 14px; color: lightgray;}
-          .time{
-            font-size: 16px; 
-            margin-left: 5px;
-            color: lightgray;
+          width: 100%;
+          .userChatInfo_title{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .name{font-size: 18px; font-weight: 500;}
+            .time{
+              font-size: 12px; 
+              margin-left: 5px;
+              color: lightgray;
+            }
           }
+          p{font-size: 14px; color: lightgray;}
         }
       }
     }
@@ -345,24 +416,19 @@
         justify-content: space-between;
         padding: 10px;
         color: lightgray;
-          .user {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-width: 80px;
-            padding: 10px;
-            &:hover{
-              background-color:  #302e52;
-              cursor: pointer;
-              border-radius: 5px;
+        .user {
+          display: flex;
+          align-items: center;
+          min-width: 80px;
+          padding: 10px;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s ease, color 0.3s ease;
+          &:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255); 
             }
-            &:active{
-              background-color:  #302e52;
-              cursor: pointer;
-              box-shadow: 2px 2px #302e52;
-              border-radius: 5px;
-            }
-          }
+        }
         
         .profile {
           height: 38px;
@@ -370,6 +436,16 @@
           border-radius: 50%;
           object-fit: cover;
           outline: 2px solid;
+        }
+        .profileInfo{
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding-left: 10px;
+          .status{
+            color: aeb0af;
+            font-size: 12px;
+          }
         }
       }
 
@@ -389,27 +465,42 @@
           margin: 15% auto; /* 15% from the top and centered */
           padding: 20px;
           border: 1px solid #888;
-          width: 200px;
+          min-width: 200px;
+          width: fit-content;
           border-radius: 5px;
           display: flex;
           flex-direction: column;
           gap: 10px;
           justify-content: center;
           align-items: center;
+          .userName{
+            font-size: 20px;
+            span{
+              font-weight: bold;
+            }
+          }
+          img{
+            height: 100px;
+            width: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            outline: 2px solid;
+          }
           .close {
-            background-color: #dddddd;
             float: right;
             font-size: 18px;
             padding: 5px;
             border-radius: 5px;
-            &:hover, 
-            &:focus {
-              color: #ffffff;
-              background-color: rgb(110, 110, 110);
-              text-decoration: none;
-              cursor: pointer;
-              padding: 5px;
-              box-shadow: 2px 2px #000000;
+            background-color: rgb(189, 188, 188); 
+            color: rgb(1, 11, 46); 
+            border: 2px solid rgb(255, 255, 255); 
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            &:hover {
+              background-color: rgb(0, 0, 0);
+              color: rgb(255, 255, 255); 
             }
           }
         }
@@ -440,7 +531,7 @@
 
         .message {
           display: flex;
-          gap: 20px;
+          gap: 15px;
           margin-bottom: 20px;
 
           .messageInfo {
@@ -448,6 +539,7 @@
             flex-direction: column;
             color: gray;
             font-weight: 300;
+            align-items: center;
 
             img {
               width: 40px;
@@ -459,73 +551,108 @@
           .messageContent {
             max-width: 60%;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            p {
-              background-color: white;
-              padding: 10px 20px;
-              border-radius: 0px 10px 10px 10px;
-              max-width: max-content;
+            position: relative;
+            height: 100%;
+            width: 100%;
+            .text{
+              display: flex;
+              p {
+                background-color: white;
+                padding: 10px 20px;
+                border-radius: 0px 10px 10px 10px;
+                max-width: max-content;
+                display: flex;
+                justify-content: space-between;
+                align-items: end;
+                gap: 5px;
+                span{
+                  font-size: 11px;
+                  font-style: italic;
+                  color: rgb(146, 146, 146);
+                }
+              }
             }
-
-            img {
-              width: 50%;
-              border: solid;
-            }
-
-            .delTime{
+            .editMode{
               display: flex;
               align-items: center;
-              justify-content: flex-end;
-              height: 5px;
-              color: #ddddf7;
-              font-size: 15px;
+              gap: 5px;
+              input{
+                padding: 10px;
+              }
             }
-
+            .icon{
+              display: none;
+              flex-shrink: 0;
+              color: #ddddf7;
+            }
             &:hover{
-              .delTime{
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                height: 5px;
-                color: rgb(133, 133, 133);
+              .icon{
+                flex-shrink: 0;
+                color: rgb(115, 115, 115);
+                transition: color 0.1s;
+                &:hover{
+                  color: rgb(0, 0, 0);
+                }
+                &:active{
+                  color: rgb(115, 115, 115);
+                }
+              }
+            }
+            .image{
+              display: flex;
+              img {
+                width: 50%;
+                border: solid;
+              }
+            }
+            .dropdownMenu{
+              background-color: white;
+              padding-top: 8px;
+              padding-bottom: 8px;
+              position: absolute;
+              right: 5px;
+              top: 15px;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              border-radius: 4px;
+              overflow: hidden;
+              z-index: 1000;
+              .dropdownItem {
+                padding: 8px 28px 8px 8px;
+                cursor: pointer;
+                color: #4b4b4b;
                 font-size: 15px;
+                white-space: nowrap;
+                &:hover {
+                  background-color: #bbbbbb;
+                }
               }
             }
           }
 
           &.owner {
+            gap: 0;
             flex-direction: row-reverse;
-
             .messageContent {
-              align-items: flex-end;
+              border-radius: 10px 0px 10px 10px;
+              height: 100%;
+              justify-content: flex-end;
               p {
                 background-color: #8da4f1;
                 color: white;
                 border-radius: 10px 0px 10px 10px;
-              }
-              .delTime{
                 display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-                color: #ddddf7;
-                font-size: 16px;
-              }
-
-              &:hover {
-                .delTime{
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  gap: 10px;
-                  color: rgb(133, 133, 133);
-                  font-size: 15px;
-                  .delChat:hover{
-                    color: rgb(43, 43, 43);
-                  }
+                // align-items: flex-start;
+                gap: 5px;
+                span{
+                  color: rgb(0, 0, 0);
                 }
+              }
+              .image{
+                display: flex;
+                justify-content: flex-end;
+              }
+              .icon{
+                display: inline;
               }
             }
           }
@@ -556,7 +683,17 @@
           display: flex;
           align-items: center;
           gap: 10px;
-
+          input{
+            display: none;
+          }
+          .emoji{
+            position: relative;
+            .picker{
+              position: absolute;
+              bottom: 50px;
+              right: 10px;
+            }
+          }
           img {
             height: 24px;
             cursor: pointer;
@@ -568,20 +705,6 @@
             }
           }
 
-          /* button {
-            border: none;
-            padding: 10px 15px;
-            color: white;
-            background-color: #8da4f1;
-            outline: 2px solid;
-            cursor: pointer;
-            &:hover{
-              background-color: #5878e4;
-            }
-            &:active{
-              background-color: #0238eb;
-            }
-          } */
           .button {
             color: gray; 
             transition: color 0.3s; 

@@ -57,12 +57,6 @@ export const AuthContextProvider = ({ children }) => {
 
   const authStateChanged = async (user) => {
     setCurrentUser(user);
-    /* (user) 
-    && (
-      await updateDoc(doc(db, "users", user.uid), {
-        isOnline: true,
-      })
-    ) */
   };
 
   useEffect(() => {

@@ -13,3 +13,21 @@ export const convertedDateTime = (utcSeconds) => {
 export const truncateString = (str, length) => {
   return str.length > length ? str.slice(0, length) + "..." : str;
 }
+
+export const displayDateOrTime = (timestampInSeconds) => {
+  const messageDate = new Date(timestampInSeconds * 1000); // Convert seconds to milliseconds
+  const today = new Date();
+
+  // Check if the message is from today
+  const isSameDay =
+    messageDate.getDate() === today.getDate() &&
+    messageDate.getMonth() === today.getMonth() &&
+    messageDate.getFullYear() === today.getFullYear();
+
+  // If the message is from today, show the time, otherwise show the date
+  if (isSameDay) {
+    return convertedDateTime(timestampInSeconds).time; // Show time in 12-hour format
+  } else {
+    return convertedDateTime(timestampInSeconds).date; // Show date in dd/mm/yyyy format
+  }
+};
