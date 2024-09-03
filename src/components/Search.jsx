@@ -1,4 +1,4 @@
-import React, { useContext, useState, useCallback, useRef } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { collection, getDoc, getDocs, query, where, doc, setDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { AuthContext } from "../context/AuthContext";
@@ -21,7 +21,7 @@ const Search = () => {
   const { currentUser } = useContext(AuthContext);
   const latestSearchText = useRef("");  // Ref to store the latest search text
 
-  const handleSearch = useCallback(debounce(async () => {
+  const handleSearch = debounce(async () => {
     const searchText = latestSearchText.current.trim();
 
     if (searchText === "") {
@@ -55,7 +55,7 @@ const Search = () => {
       console.error("Error searching for users:", error);
       setLoading(false)
     }
-  }, 500), []); // Debounce with a delay of 500ms
+  }, 500); // Debounce with a delay of 500ms
 
   const handleInputChange = (e) => {
     const searchText = e.target.value;

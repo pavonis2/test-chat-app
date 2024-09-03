@@ -23,7 +23,7 @@ const Input = () => {
 
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   // Reference to the dropdown
   const emojiRef = useRef();
@@ -56,90 +56,115 @@ const Input = () => {
   }, []);
 
   const handleSend = async () => {
-    if (img) {
-      
-      const date = new Date().getTime();
-      const storageRef = ref(storage, `${uuid() + date}`);
+    try {
+      if (img) {
+        const date = new Date().getTime();
+        const storageRef = ref(storage, `${uuid() + date}`);
 
-      await uploadBytesResumable(storageRef, img).then(() => {
-        getDownloadURL(storageRef).then(async (downloadURL) => {
-          try {
-            await updateDoc(doc(db, "chats", data.chatId), {
-              messages: arrayUnion({
-                id: uuid(),
-                text,
-                senderId: currentUser.uid,
-                date: Timestamp.now(),
-                img: downloadURL,
-              }),
-            });
-          } catch (error) {
-            setErr(true);
-          }
-          });
-        }
-      );
-    } else {
-      await updateDoc(doc(db, "chats", data.chatId), {
-        messages: arrayUnion({
-          id: uuid(),
+        await uploadBytesResumable(storageRef, img);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        await updateDoc(doc(db, "chats", data.chatId), {
+          messages: arrayUnion({
+            id: uuid(),
+            text,
+            senderId: currentUser.uid,
+            date: Timestamp.now(),
+            img: downloadURL,
+          }),
+        });
+      } else {
+        await updateDoc(doc(db, "chats", data.chatId), {
+          messages: arrayUnion({
+            id: uuid(),
+            text,
+            senderId: currentUser.uid,
+            date: Timestamp.now(),
+            img: "",
+          }),
+        });
+      }
+
+      await updateDoc(doc(db, "userChats", currentUser.uid), {
+        [data.chatId + ".lastMessage"]: {
           text,
+          isSeen: true,
           senderId: currentUser.uid,
-          date: Timestamp.now(),
-          img: "",
-        }),
+        },
+        [data.chatId + ".date"]: Timestamp.now(),
       });
+
+      await updateDoc(doc(db, "userChats", data.user.uid), {
+        [data.chatId + ".lastMessage"]: {
+          text,
+          isSeen: false,
+          senderId: currentUser.uid,
+        },
+        [data.chatId + ".date"]: Timestamp.now(),
+      });
+
+      setText("");
+      setOpen(false);
+      setImg(null);
+      setErr(false); // Reset error state on successful send
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setErr(true); // Set error state if an exception occurs
+      setTimeout(() => {
+        setErr(false); // Clear error state after 3 seconds
+      }, 3000);
     }
-
-    await updateDoc(doc(db, "userChats", currentUser.uid), {
-      [data.chatId + ".lastMessage"]: {
-        text,
-        isSeen: true,
-        senderId: currentUser.uid,
-      },
-      [data.chatId + ".date"]: Timestamp.now(),
-    });
-
-    await updateDoc(doc(db, "userChats", data.user.uid), {
-      [data.chatId + ".lastMessage"]: {
-        text,
-        isSeen: false,
-        senderId: currentUser.uid,
-      },
-      [data.chatId + ".date"]: Timestamp.now(),
-    });
-
-    setText("");
-    setOpen(false);
-    setImg(null);
-  }
+  };
 
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
-  }
+  };
 
   return (
     <div className='input'>
-      {img ? <input type="text" disabled/> : <input type="text" placeholder='Type something...' onChange={e=>setText(e.target.value)} value={text}/>}
+      {img ? (
+        <input type="text" disabled />
+      ) : (
+        <input
+          type="text"
+          placeholder='Type something...'
+          onChange={(e) => setText(e.target.value)}
+          value={text}
+        />
+      )}
       <div className="send">
-        <input type="file" id='file' accept="image/*" onChange={(e) => setImg(e.target.files[0])}/>
+        <input
+          type="file"
+          id='file'
+          accept="image/*"
+          onChange={(e) => setImg(e.target.files[0])}
+        />
         <label htmlFor='file'>
           {img ? (
-              <GrCheckboxSelected size={24} color="green" className="button"/>
-            ) : (
-              <AiOutlinePicture size={24} className="button"/>
-            )}
+            <GrCheckboxSelected size={24} color="green" className="button" />
+          ) : (
+            <AiOutlinePicture size={24} className="button" />
+          )}
         </label>
         <div className="emoji">
-          {!img && <VscSmiley size={24} className="button" onClick={() => setOpen((prev) => !prev)}/>}
+          {!img && (
+            <VscSmiley size={24} className="button" onClick={() => setOpen((prev) => !prev)} />
+          )}
           <div className="picker" ref={emojiRef}>
-            <EmojiPicker open={open} onEmojiClick={handleEmoji}/>
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        {(text.length > 0 || img) && <IoMdSend className="button" onClick={handleSend} size={24}/>}
+        {(text.length > 0 || img) && (
+          <IoMdSend className="button" onClick={handleSend} size={24} />
+        )}
       </div>
+      {err && (
+        <div className="error">
+          <p>Error sending message. Please try again.</p>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;

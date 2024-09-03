@@ -79,16 +79,6 @@
         cursor: pointer;
       }
 
-      .errorMessage {
-        display: flex;
-        background-color: #fce4e4;
-        border: 1px solid #fcc2c3;
-        color: #cc0033;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-      }
-
       label {
         display: flex;
         align-items: center;
@@ -563,7 +553,7 @@
                 max-width: max-content;
                 display: flex;
                 justify-content: space-between;
-                align-items: end;
+                align-items: flex-end;
                 gap: 5px;
                 span{
                   font-size: 11px;
@@ -627,6 +617,22 @@
                 }
               }
             }
+            .error {
+              position: absolute;
+              background-color: #f8d7da;
+              color: #721c24;
+              border: 1px solid #f5c6cb;
+              border-radius: 5px; 
+              padding: 10px; 
+              font-size: 16px; 
+              font-family: Arial, sans-serif; 
+              display: flex;
+              align-items: center; 
+              p {
+                margin: 0; 
+                font-size: 13px;
+              }
+            }
           }
 
           &.owner {
@@ -641,7 +647,6 @@
                 color: white;
                 border-radius: 10px 0px 10px 10px;
                 display: flex;
-                // align-items: flex-start;
                 gap: 5px;
                 span{
                   color: rgb(0, 0, 0);
@@ -653,6 +658,12 @@
               }
               .icon{
                 display: inline;
+              }
+              .error{
+                p{
+                  background-color: transparent;
+                  color: #721c24; 
+                }
               }
             }
           }
@@ -666,6 +677,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        position: relative;
 
         input {
           width: 100%;
@@ -715,6 +727,23 @@
             &:active{
               color: blue;
             }
+          }
+        }
+        .error {
+          position: absolute;
+          background-color: #f8d7da; 
+          color: #721c24; 
+          border: 1px solid #f5c6cb;
+          border-radius: 5px; 
+          padding: 10px; 
+          margin: 20px 0; 
+          font-size: 16px; 
+          font-family: Arial, sans-serif;
+          display: flex;
+          align-items: center; 
+          p {
+            margin: 0; 
+            font-weight: 500; 
           }
         }
       }
