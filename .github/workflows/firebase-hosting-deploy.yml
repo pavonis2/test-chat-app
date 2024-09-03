@@ -29,4 +29,4 @@ jobs:
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          projectId: chat-e0854  # Replace with your Firebase project ID
+          projectId: your-project-id chat-e0854  # Replace with your Firebase project ID
