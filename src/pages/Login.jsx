@@ -4,7 +4,6 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { BeatLoader } from 'react-spinners';
 import { doc, updateDoc } from 'firebase/firestore';
-import testUserCredentials from "../testUserCredentials";
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -38,8 +37,8 @@ export const Login = () => {
   };
 
   const handleTestUserLogin = async () => {
-    setEmail(testUserCredentials.email);
-    setPassword(testUserCredentials.password);
+    setEmail(process.env.REACT_APP_TEST_USER_EMAIL);
+    setPassword(process.env.REACT_APP_TEST_USER_PASSWORD);
 
     // Wait for the state to update before attempting to submit
     setIsLoading(true);
