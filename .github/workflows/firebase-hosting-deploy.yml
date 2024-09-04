@@ -29,6 +29,9 @@ jobs:
           echo "REACT_APP_TEST_USER_EMAIL=${{ secrets.REACT_APP_TEST_USER_EMAIL }}" >> $GITHUB_ENV
           echo "REACT_APP_TEST_USER_PASSWORD=${{ secrets.REACT_APP_TEST_USER_PASSWORD }}" >> $GITHUB_ENV
 
+      - name: Debug Environment Variables
+        run: echo "REACT_APP_FIREBASE_API_KEY=${{ secrets.REACT_APP_FIREBASE_API_KEY }}"
+
       - name: Install dependencies
         run: npm install
 
