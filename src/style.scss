@@ -78,6 +78,24 @@
         border: none;
         cursor: pointer;
       }
+      .errorMessage {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px; 
+        padding: 10px; 
+        font-size: 16px; 
+        font-family: Arial, sans-serif; 
+        display: flex;
+        align-items: center; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        p {
+          margin: 0; 
+          font-size: 13px;
+        }
+      }
 
       label {
         display: flex;
@@ -334,6 +352,12 @@
           display: flex;
           justify-content: space-between;
           .button{
+            display: flex;
+            align-items: center;
+            color: #ddddf7;
+            cursor: pointer;
+            padding: 3px;
+            gap: 5px;
             background-color: rgb(255, 255, 255); 
             color: rgb(1, 11, 46); 
             border: 2px solid rgb(255, 255, 255); 
@@ -341,9 +365,12 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, color 0.3s ease;
-            &:hover {
-              background-color: rgb(0, 0, 0);
-              color: rgb(255, 255, 255); 
+          &:hover {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 255, 255); 
+          } 
+            span{
+              font-size: 16px;
             }
           }
           .userProfile{
