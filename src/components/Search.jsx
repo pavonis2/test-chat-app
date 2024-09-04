@@ -173,7 +173,10 @@ const Search = () => {
                     <span>{user.displayName}</span>
                   </div>
                 </div>
-                <AiOutlineUserAdd className='button' onClick={() => handleSelect(user)} />
+                <div className='button' onClick={() => handleSelect(user)}>
+                  <AiOutlineUserAdd size={19}/>
+                  <span>Add</span>
+                </div>
               </div>
           )))}
         </div>
