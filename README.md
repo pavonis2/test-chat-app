@@ -1,70 +1,68 @@
-# Getting Started with Create React App
+# React + Firebase Chat App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is built with React and Firebase Chat App.
 
-## Available Scripts
+Chat app is a real-time chat application where the user can chat with another user. This app supports email authentication that means user can signup with a new email and password and have that as your login credentials. The user can add other users who are registered on the app by searching for them with their username. User can send messages(text and emojis) to each other & share images. User can delete and edit said messages and images. After adding them to your chats, the user can see other user's information such as profile and last online status. The unread messages from another user is highlighted in your chats section. All of these updates and changes happen in real time. So go to Chat App and enjoy chatting with people.
 
-In the project directory, you can run:
+## Languages used
 
-### `npm start`
+- HTML
+- CSS
+- JavaScript
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tools/Library used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- React (v18.2.0)
+- React router (v6.14.0)
+- Firebase (v9.23.0)
+- Sass (v1.63.6)
+- react-spinners: (0.13.8)
+- For storing messages I have used firebase storage and firebase real-time database firestore
+- Deployed on firebase hosting
 
-### `npm test`
+## Features/Functionality
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- User authentication with email
+- View profile ( username, avatar & email)
+- Search for users by their username if registered in the Chat app & add them
+- Realtime chat message
+- Send, edit and delete own chat
+- Send emojis
+- Send images upto 5mb
+- Oraganized chat date wise
+- Display chats send time
+- View user status (user is Online or Offline)
+- View user information (name, avatar, email)
+- Highlights the unread messages in the user's chat section
 
-### `npm run build`
+## Author
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [Rohan M V](https://www.linkedin.com/in/rohan-m-v-228860220/)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Screenshots
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Login page
 
-### `npm run eject`
+![Login-page](https://github.com/pavonis2/test-chat-app/blob/86336e56959e34f92c3aff58b49c20ee79cc4b0f/Chat%20App%20-%20Login%20page.png)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Register page
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+![Register-page](https://github.com/pavonis2/test-chat-app/blob/86336e56959e34f92c3aff58b49c20ee79cc4b0f/Chat%20App%20-%20Register%20page.png)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Home page
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+![home](https://github.com/pavonis2/test-chat-app/blob/86336e56959e34f92c3aff58b49c20ee79cc4b0f/Chat%20App%20-%20Home%20page.png)
 
-## Learn More
+### Search & Add users
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+![search-and-add-users](https://github.com/pavonis2/test-chat-app/blob/86336e56959e34f92c3aff58b49c20ee79cc4b0f/Chat%20App%20-%20Search%20%26%20Add%20users.png)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### User profile
 
-### Code Splitting
+![user-profile-modal](https://github.com/pavonis2/test-chat-app/blob/86336e56959e34f92c3aff58b49c20ee79cc4b0f/Chat%20App%20-%20User%20profile.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+*If you liked my project feel free give it a star*
 
-### Analyzing the Bundle Size
+*Thank you*
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+*Rohan M V*
