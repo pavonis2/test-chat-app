@@ -30,3 +30,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: chat-e0854  # Replace with your Firebase project ID
+          channelId: preview  # Specify the channel ID (e.g., preview)
