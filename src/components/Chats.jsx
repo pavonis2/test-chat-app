@@ -83,11 +83,11 @@ const Chats = ({searchTerm, showChats}) => {
                       chat[1].lastMessage.senderId && (
                         chat[1].lastMessage.senderId === currentUser.uid ? 
                           (chat[1].lastMessage?.text ?
-                            (truncateString(`You: ${chat[1].lastMessage?.text}`, 30)) :
+                            (truncateString(`You: ${chat[1].lastMessage?.text}`, 25)) :
                             (`You: 📁 Photo`)
                           ) : 
                           (chat[1].lastMessage?.text ?
-                            (truncateString(`${chat[1].lastMessage?.text}`, 35)) :
+                            (truncateString(`${chat[1].lastMessage?.text}`, 25)) :
                             (`📁 Photo`)
                           )
                   )}
