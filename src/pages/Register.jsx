@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Add from "../img/addAvatar.png";
 import DefaultAvatar from "../img/default_avatar.png";
+import imageCompression from 'browser-image-compression';
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db, storage } from "../firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -51,8 +52,20 @@ export const Register = () => {
       return;
     }
 
-    // If no file is provided, use the default avatar
-    if (!file) {
+    // Compress image if a file is provided, otherwise use the default avatar
+    if (file) {
+      const options = {
+        maxSizeMB: 0.1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+
+      try {
+        file = await imageCompression(file, options); // Compress the image
+      } catch (err) {
+        console.error("Image compression failed:", err);
+      }
+    } else {
       const response = await fetch(DefaultAvatar);
       const blob = await response.blob();
       file = new File([blob], "default_avatar.png", { type: "image/png" });
