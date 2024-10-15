@@ -18,6 +18,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
+testUserCredentials.js
+firebasecredentials.js
 
 npm-debug.log*
 yarn-debug.log*
