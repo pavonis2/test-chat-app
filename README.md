@@ -2,7 +2,7 @@
 
 This project is built with React and Firebase Chat App.
 
-Chat app is a real-time chat application where the user can chat with another user. This app supports email authentication that means user can signup with a new email and password and have that as your login credentials. The user can add other users who are registered on the app by searching for them with their username. User can send messages(text and emojis) to each other & share images. User can delete and edit said messages and images. After adding them to your chats, the user can see other user's information such as profile and last online status. The unread messages from another user is highlighted in your chats section. All of these updates and changes happen in real time. So go to Chat App and enjoy chatting with people.
+Chat app is a real-time chat application where the user can chat with another user. This app supports email authentication that means user can signup with a new email and password and have that as your login credentials. The user can add other users who are registered on the app by searching for them with their username. User can send messages(text and emojis) to each other & share images. User can delete and edit said messages and images. After adding them to your chats, the user can see other user's information such as profile and user's online status. The unread messages from another user is highlighted in your chats section. Similar to WhatsApp messages load in batches, where to see older messages you have to scroll down for the next set of older messages to load in. All of these updates and changes happen in real time. So go to Chat App and enjoy chatting with people!!!
 
 ## Languages used
 
@@ -28,12 +28,13 @@ Chat app is a real-time chat application where the user can chat with another us
 - Realtime chat message
 - Send, edit and delete own chat
 - Send emojis
-- Send images upto 5mb
+- Send images
 - Oraganized chat date wise
 - Display chats send time
 - View user status (user is Online or Offline)
 - View user information (name, avatar, email)
 - Highlights the unread messages in the user's chat section
+- Scrolling down will load older messages in batches
 
 ## Author
 
