@@ -7,7 +7,7 @@ import { db } from '../firebase';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
-const Message = ({ message, msgId, messages }) => {
+const Message = ({ message, msgId, messages, allMessages }) => {
   const [err, setErr] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -26,7 +26,7 @@ const Message = ({ message, msgId, messages }) => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
+  
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -66,7 +66,7 @@ const Message = ({ message, msgId, messages }) => {
     try {
       if (newMessageText) {
         // Update the specific message's text in the messages array
-        const updatedMessages = messages.map((m) => 
+        const updatedMessages = allMessages.map((m) => 
           m.id === msgId ? { ...m, text: newMessageText, edited: true } : m
         );
 
@@ -75,7 +75,7 @@ const Message = ({ message, msgId, messages }) => {
           messages: updatedMessages
         });
 
-        if (messages[messages.length - 1].id === msgId) {
+        if (messages[0].id === msgId) {
           await updateDoc(doc(db, "userChats", currentUser.uid), {
             [data.chatId + ".lastMessage"]: {
               isSeen: true,
@@ -116,7 +116,7 @@ const Message = ({ message, msgId, messages }) => {
           messages: arrayRemove(messageToDelete),
         });
 
-        if (messages[messages.length - 1].id === msgId) {
+        if (messages[0].id === msgId) {
           await updateDoc(doc(db, "userChats", currentUser.uid), {
             [data.chatId + ".lastMessage"]: {
               isSeen: true,
