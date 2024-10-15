@@ -3,24 +3,19 @@ import { IoMdSend } from "react-icons/io";
 import { AiOutlinePicture } from "react-icons/ai";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
-import {
-  arrayUnion,
-  doc,
-  Timestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { arrayUnion, doc, Timestamp, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import EmojiPicker from "emoji-picker-react";
-import { GrCheckboxSelected } from 'react-icons/gr';
+import { GrCheckboxSelected } from "react-icons/gr";
 import { VscSmiley } from "react-icons/vsc";
+import imageCompression from "browser-image-compression";
 
 const Input = () => {
   const [text, setText] = useState("");
   const [img, setImg] = useState(null);
   const [err, setErr] = useState(false);
-
   const { currentUser } = useContext(AuthContext);
   const { data } = useContext(ChatContext);
   const [open, setOpen] = useState(false);
@@ -34,34 +29,41 @@ const Input = () => {
         setOpen(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // Close dropdown if "Escape" is pressed
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setOpen(false);
       }
     };
-
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
   const handleSend = async () => {
     try {
+      let compressedImg = img;
+
       if (img) {
+        const options = {
+          maxSizeMB: 0.01, 
+          maxWidthOrHeight: 1920, 
+          useWebWorker: true,
+        };
+
+        compressedImg = await imageCompression(img, options);
+
         const date = new Date().getTime();
         const storageRef = ref(storage, `${uuid() + date}`);
+        await uploadBytesResumable(storageRef, compressedImg);
 
-        await uploadBytesResumable(storageRef, img);
         const downloadURL = await getDownloadURL(storageRef);
 
         await updateDoc(doc(db, "chats", data.chatId), {
@@ -74,6 +76,7 @@ const Input = () => {
           }),
         });
       } else {
+        // No image, just send text
         await updateDoc(doc(db, "chats", data.chatId), {
           messages: arrayUnion({
             id: uuid(),
@@ -103,15 +106,16 @@ const Input = () => {
         [data.chatId + ".date"]: Timestamp.now(),
       });
 
+      // Reset input fields
       setText("");
       setOpen(false);
       setImg(null);
-      setErr(false); // Reset error state on successful send
+      setErr(false);
     } catch (error) {
       console.error("Error sending message:", error);
-      setErr(true); // Set error state if an exception occurs
+      setErr(true);
       setTimeout(() => {
-        setErr(false); // Clear error state after 3 seconds
+        setErr(false);
       }, 3000);
     }
   };
@@ -121,13 +125,13 @@ const Input = () => {
   };
 
   return (
-    <div className='input'>
+    <div className="input">
       {img ? (
         <input type="text" disabled />
       ) : (
         <input
           type="text"
-          placeholder='Type something...'
+          placeholder="Type something..."
           onChange={(e) => setText(e.target.value)}
           value={text}
         />
@@ -135,11 +139,11 @@ const Input = () => {
       <div className="send">
         <input
           type="file"
-          id='file'
+          id="file"
           accept="image/*"
           onChange={(e) => setImg(e.target.files[0])}
         />
-        <label htmlFor='file'>
+        <label htmlFor="file">
           {img ? (
             <GrCheckboxSelected size={24} color="green" className="button" />
           ) : (
