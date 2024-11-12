@@ -1,4 +1,5 @@
-# React + Firebase Chat App
+# React + Firebase Chat App 
+**live demo: [Chat App](https://chat-e0854.firebaseapp.com/)**
 
 This project is built with React and Firebase Chat App.
 
